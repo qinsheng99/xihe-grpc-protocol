@@ -9,9 +9,10 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/opensourceways/xihe-grpc-protocol/protocol"
+	"github.com/opensourceways/xihe-grpc-protocol/training"
 )
 
-func Start(port string, s TrainingService) error {
+func Start(port string, s training.TrainingService) error {
 	listen, err := net.Listen("tcp", port)
 	if err != nil {
 		return err
@@ -36,20 +37,20 @@ func run(server *grpc.Server, listen net.Listener) error {
 }
 
 type trainingServer struct {
-	s TrainingService
+	s training.TrainingService
 	protocol.UnimplementedTrainingServer
 }
 
 func (t *trainingServer) SetTrainingInfo(ctx context.Context, v *protocol.TrainingInfo) (
 	*protocol.Result, error,
 ) {
-	index := TrainingIndex{
+	index := training.TrainingIndex{
 		Id:        v.GetId(),
 		User:      v.GetUser(),
 		ProjectId: v.GetProjectId(),
 	}
 
-	info := TrainingInfo{
+	info := training.TrainingInfo{
 		OutputZipPath: v.GetOutputZipPath(),
 		AimZipPath:    v.GetAimZipPath(),
 		LogPath:       v.GetLogPath(),

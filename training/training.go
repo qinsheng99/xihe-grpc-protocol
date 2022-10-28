@@ -1,4 +1,4 @@
-package server
+package training
 
 type TrainingIndex struct {
 	Id        string
