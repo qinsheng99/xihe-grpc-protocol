@@ -1,18 +1,19 @@
 package server
 
-type TrainingInfo struct {
+type TrainingIndex struct {
 	Id        string
 	User      string
 	ProjectId string
 }
 
-type TrainingOutput struct {
-	AimPath       string
+type TrainingInfo struct {
+	Duration      int
+	Status        string
+	LogPath       string
+	AimZipPath    string
 	OutputZipPath string
 }
 
 type TrainingService interface {
-	SetTrainingStatus(*TrainingInfo, string) error
-	SetTrainingOutput(*TrainingInfo, *TrainingOutput) error
-	SetTrainingLogPath(*TrainingInfo, string) error
+	SetTrainingInfo(*TrainingIndex, *TrainingInfo) error
 }

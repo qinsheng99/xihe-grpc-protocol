@@ -18,9 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TrainingClient interface {
-	SetTrainingStatus(ctx context.Context, in *TrainingStatus, opts ...grpc.CallOption) (*Result, error)
-	SetTrainingOutput(ctx context.Context, in *TrainingOutput, opts ...grpc.CallOption) (*Result, error)
-	SetTrainingLogPath(ctx context.Context, in *TrainingLogPath, opts ...grpc.CallOption) (*Result, error)
+	SetTrainingInfo(ctx context.Context, in *TrainingInfo, opts ...grpc.CallOption) (*Result, error)
 }
 
 type trainingClient struct {
@@ -31,27 +29,9 @@ func NewTrainingClient(cc grpc.ClientConnInterface) TrainingClient {
 	return &trainingClient{cc}
 }
 
-func (c *trainingClient) SetTrainingStatus(ctx context.Context, in *TrainingStatus, opts ...grpc.CallOption) (*Result, error) {
+func (c *trainingClient) SetTrainingInfo(ctx context.Context, in *TrainingInfo, opts ...grpc.CallOption) (*Result, error) {
 	out := new(Result)
-	err := c.cc.Invoke(ctx, "/xiheInternal.Training/SetTrainingStatus", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *trainingClient) SetTrainingOutput(ctx context.Context, in *TrainingOutput, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
-	err := c.cc.Invoke(ctx, "/xiheInternal.Training/SetTrainingOutput", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *trainingClient) SetTrainingLogPath(ctx context.Context, in *TrainingLogPath, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
-	err := c.cc.Invoke(ctx, "/xiheInternal.Training/SetTrainingLogPath", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/xiheInternal.Training/SetTrainingInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +42,7 @@ func (c *trainingClient) SetTrainingLogPath(ctx context.Context, in *TrainingLog
 // All implementations must embed UnimplementedTrainingServer
 // for forward compatibility
 type TrainingServer interface {
-	SetTrainingStatus(context.Context, *TrainingStatus) (*Result, error)
-	SetTrainingOutput(context.Context, *TrainingOutput) (*Result, error)
-	SetTrainingLogPath(context.Context, *TrainingLogPath) (*Result, error)
+	SetTrainingInfo(context.Context, *TrainingInfo) (*Result, error)
 	mustEmbedUnimplementedTrainingServer()
 }
 
@@ -72,14 +50,8 @@ type TrainingServer interface {
 type UnimplementedTrainingServer struct {
 }
 
-func (UnimplementedTrainingServer) SetTrainingStatus(context.Context, *TrainingStatus) (*Result, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetTrainingStatus not implemented")
-}
-func (UnimplementedTrainingServer) SetTrainingOutput(context.Context, *TrainingOutput) (*Result, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetTrainingOutput not implemented")
-}
-func (UnimplementedTrainingServer) SetTrainingLogPath(context.Context, *TrainingLogPath) (*Result, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetTrainingLogPath not implemented")
+func (UnimplementedTrainingServer) SetTrainingInfo(context.Context, *TrainingInfo) (*Result, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetTrainingInfo not implemented")
 }
 func (UnimplementedTrainingServer) mustEmbedUnimplementedTrainingServer() {}
 
@@ -94,56 +66,20 @@ func RegisterTrainingServer(s grpc.ServiceRegistrar, srv TrainingServer) {
 	s.RegisterService(&Training_ServiceDesc, srv)
 }
 
-func _Training_SetTrainingStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TrainingStatus)
+func _Training_SetTrainingInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrainingInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TrainingServer).SetTrainingStatus(ctx, in)
+		return srv.(TrainingServer).SetTrainingInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/xiheInternal.Training/SetTrainingStatus",
+		FullMethod: "/xiheInternal.Training/SetTrainingInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TrainingServer).SetTrainingStatus(ctx, req.(*TrainingStatus))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Training_SetTrainingOutput_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TrainingOutput)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TrainingServer).SetTrainingOutput(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/xiheInternal.Training/SetTrainingOutput",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TrainingServer).SetTrainingOutput(ctx, req.(*TrainingOutput))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Training_SetTrainingLogPath_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TrainingLogPath)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TrainingServer).SetTrainingLogPath(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/xiheInternal.Training/SetTrainingLogPath",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TrainingServer).SetTrainingLogPath(ctx, req.(*TrainingLogPath))
+		return srv.(TrainingServer).SetTrainingInfo(ctx, req.(*TrainingInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -156,16 +92,8 @@ var Training_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TrainingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SetTrainingStatus",
-			Handler:    _Training_SetTrainingStatus_Handler,
-		},
-		{
-			MethodName: "SetTrainingOutput",
-			Handler:    _Training_SetTrainingOutput_Handler,
-		},
-		{
-			MethodName: "SetTrainingLogPath",
-			Handler:    _Training_SetTrainingLogPath_Handler,
+			MethodName: "SetTrainingInfo",
+			Handler:    _Training_SetTrainingInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

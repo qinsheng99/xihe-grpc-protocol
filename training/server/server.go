@@ -40,39 +40,22 @@ type trainingServer struct {
 	protocol.UnimplementedTrainingServer
 }
 
-func (t *trainingServer) toTrainingInfo(v *protocol.TrainingInfo) TrainingInfo {
-	return TrainingInfo{
-		Id:        v.Id,
-		User:      v.User,
-		ProjectId: v.ProjectId,
-	}
-}
-
-func (t *trainingServer) SetTrainingStatus(ctx context.Context, v *protocol.TrainingStatus) (
+func (t *trainingServer) SetTrainingInfo(ctx context.Context, v *protocol.TrainingInfo) (
 	*protocol.Result, error,
 ) {
-	info := t.toTrainingInfo(v.Info)
-
-	return nil, t.s.SetTrainingStatus(&info, v.Status)
-}
-
-func (t *trainingServer) SetTrainingOutput(ctx context.Context, v *protocol.TrainingOutput) (
-	*protocol.Result, error,
-) {
-	info := t.toTrainingInfo(v.Info)
-
-	output := TrainingOutput{
-		OutputZipPath: v.OutputZipPath,
-		AimPath:       v.AimPath,
+	index := TrainingIndex{
+		Id:        v.GetId(),
+		User:      v.GetUser(),
+		ProjectId: v.GetProjectId(),
 	}
 
-	return nil, t.s.SetTrainingOutput(&info, &output)
-}
+	info := TrainingInfo{
+		OutputZipPath: v.GetOutputZipPath(),
+		AimZipPath:    v.GetAimZipPath(),
+		LogPath:       v.GetLogPath(),
+		Status:        v.GetStatus(),
+		Duration:      int(v.GetDuration()),
+	}
 
-func (t *trainingServer) SetTrainingLogPath(ctx context.Context, v *protocol.TrainingLogPath) (
-	*protocol.Result, error,
-) {
-	info := t.toTrainingInfo(v.Info)
-
-	return nil, t.s.SetTrainingLogPath(&info, v.Path)
+	return nil, t.s.SetTrainingInfo(&index, &info)
 }

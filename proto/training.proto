@@ -5,31 +5,18 @@ package xiheInternal;
 option go_package = "../protocol";
 
 message TrainingInfo {
-  string id = 1;
-  string user = 2;
-  string project_id = 3;
-}
-
-message TrainingStatus {
-  TrainingInfo info = 1;
-  string       status = 2;
-}
-
-message TrainingLogPath {
-  TrainingInfo info = 1;
-  string       path = 2;
-}
-
-message TrainingOutput {
-  TrainingInfo info = 1;
-  string       aim_path = 2;
-  string       output_zip_path = 3;
+  string id               = 1;
+  string user             = 2;
+  string status           = 3;
+  string log_path         = 4;
+  string project_id       = 5;
+  string aim_zip_path     = 6;
+  string output_zip_path  = 7;
+  int32  duration         = 8;
 }
 
 message Result {}
 
 service Training {
-  rpc SetTrainingStatus(TrainingStatus) returns (Result) {}
-  rpc SetTrainingOutput(TrainingOutput) returns (Result) {}
-  rpc SetTrainingLogPath(TrainingLogPath) returns (Result) {}
+  rpc SetTrainingInfo(TrainingInfo) returns (Result) {}
 }
