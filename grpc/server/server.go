@@ -2,38 +2,63 @@ package server
 
 import (
 	"context"
+	"errors"
 	"net"
 
 	"github.com/opensourceways/community-robot-lib/interrupts"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
 	"github.com/opensourceways/xihe-grpc-protocol/protocol"
-	"github.com/opensourceways/xihe-grpc-protocol/training"
 )
 
-func Start(port string, s training.TrainingService) error {
+type Server interface {
+	Run(string) error
+
+	RegisterTrainingServer(training.TrainingService) error
+}
+
+func NewServer() Server {
+	return serverImpl{grpc.NewServer()}
+}
+
+type serverImpl struct {
+	server *grpc.Server
+}
+
+func (impl serverImpl) RegisterTrainingServer(s training.TrainingService) error {
+	if s == nil {
+		return errors.New("invliad service")
+	}
+
+	if impl.server == nil {
+		return errors.New("no server")
+	}
+
+	protocol.RegisterTrainingServer(impl.server, &trainingServer{s: s})
+
+	return nil
+}
+
+func (impl serverImpl) Run(port string) error {
+	if impl.server == nil {
+		return errors.New("no server")
+	}
+
 	listen, err := net.Listen("tcp", port)
 	if err != nil {
 		return err
 	}
 
-	server := grpc.NewServer()
-
-	protocol.RegisterTrainingServer(server, &trainingServer{s: s})
-
-	return run(server, listen)
-}
-
-func run(server *grpc.Server, listen net.Listener) error {
 	defer interrupts.WaitForGracefulShutdown()
 
 	interrupts.OnInterrupt(func() {
 		logrus.Errorf("grpc server exit...")
-		server.Stop()
+		impl.server.Stop()
 	})
 
-	return server.Serve(listen)
+	return impl.server.Serve(listen)
 }
 
 type trainingServer struct {

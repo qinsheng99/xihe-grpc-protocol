@@ -5,8 +5,8 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
 	"github.com/opensourceways/xihe-grpc-protocol/protocol"
-	"github.com/opensourceways/xihe-grpc-protocol/training"
 )
 
 func NewClient(endpoint string) (*Client, error) {
