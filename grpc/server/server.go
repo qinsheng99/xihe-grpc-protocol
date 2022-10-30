@@ -83,5 +83,6 @@ func (t *trainingServer) SetTrainingInfo(ctx context.Context, v *protocol.Traini
 		Duration:      int(v.GetDuration()),
 	}
 
-	return nil, t.s.SetTrainingInfo(&index, &info)
+	// Must return new(protocol.Result), or grpc will failed.
+	return new(protocol.Result), t.s.SetTrainingInfo(&index, &info)
 }
