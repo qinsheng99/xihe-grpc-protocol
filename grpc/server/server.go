@@ -46,7 +46,7 @@ func (impl serverImpl) Run(port string) error {
 		return errors.New("no server")
 	}
 
-	listen, err := net.Listen("tcp", port)
+	listen, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return err
 	}
