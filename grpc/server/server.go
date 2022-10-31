@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
 	"github.com/opensourceways/xihe-grpc-protocol/protocol"
 )
@@ -67,7 +68,7 @@ type trainingServer struct {
 }
 
 func (t *trainingServer) SetTrainingInfo(ctx context.Context, v *protocol.TrainingInfo) (
-	*protocol.Result, error,
+	*protocol.TrainingResult, error,
 ) {
 	index := training.TrainingIndex{
 		Id:        v.GetId(),
@@ -84,5 +85,30 @@ func (t *trainingServer) SetTrainingInfo(ctx context.Context, v *protocol.Traini
 	}
 
 	// Must return new(protocol.Result), or grpc will failed.
-	return new(protocol.Result), t.s.SetTrainingInfo(&index, &info)
+	return new(protocol.TrainingResult), t.s.SetTrainingInfo(&index, &info)
+}
+
+// inference
+type inferenceServer struct {
+	s inference.InferenceService
+	protocol.UnimplementedInferenceServer
+}
+
+func (t *inferenceServer) SetInferenceInfo(ctx context.Context, v *protocol.InferenceInfo) (
+	*protocol.InferenceResult, error,
+) {
+	index := inference.InferenceIndex{
+		Id:         v.GetId(),
+		User:       v.GetUser(),
+		ProjectId:  v.GetProjectId(),
+		LastCommit: v.GetLastCommit(),
+	}
+
+	info := inference.InferenceInfo{
+		Error:     v.GetError(),
+		AccessURL: v.GetAccessUrl(),
+	}
+
+	// Must return new(protocol.Result), or grpc will failed.
+	return new(protocol.InferenceResult), t.s.SetInferenceInfo(&index, &info)
 }

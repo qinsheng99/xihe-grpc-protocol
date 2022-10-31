@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package inference;
+
+option go_package = "../protocol";
+
+message InferenceInfo {
+  string id               = 1;
+  string user             = 2;
+  string project_id       = 3;
+  string last_commit      = 4;
+  string error            = 5;
+  string access_url       = 6;
+}
+
+message InferenceResult {}
+
+service Inference {
+  rpc SetInferenceInfo(InferenceInfo) returns (InferenceResult) {}
+}

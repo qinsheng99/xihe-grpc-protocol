@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package xiheInternal;
+package training;
 
 option go_package = "../protocol";
 
@@ -15,8 +15,8 @@ message TrainingInfo {
   int32  duration         = 8;
 }
 
-message Result {}
+message TrainingResult {}
 
 service Training {
-  rpc SetTrainingInfo(TrainingInfo) returns (Result) {}
+  rpc SetTrainingInfo(TrainingInfo) returns (TrainingResult) {}
 }

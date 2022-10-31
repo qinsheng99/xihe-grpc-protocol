@@ -5,32 +5,66 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
 	"github.com/opensourceways/xihe-grpc-protocol/protocol"
 )
 
-func NewClient(endpoint string) (*Client, error) {
-	conn, err := grpc.Dial(endpoint, grpc.WithInsecure())
+func NewTrainingClient(endpoint string) (*TrainingClient, error) {
+	c, err := newConn(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{
-		conn: conn,
-		cli:  protocol.NewTrainingClient(conn),
+	return &TrainingClient{
+		clientConn: &c,
+		cli:        protocol.NewTrainingClient(c.conn),
 	}, nil
 }
 
-type Client struct {
+func NewInferenceClient(endpoint string) (*InferenceClient, error) {
+	c, err := newConn(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return &InferenceClient{
+		clientConn: &c,
+		cli:        protocol.NewInferenceClient(c.conn),
+	}, nil
+}
+
+func newConn(endpoint string) (c clientConn, err error) {
+	conn, err := grpc.Dial(endpoint, grpc.WithInsecure())
+	if err == nil {
+		c.conn = conn
+	}
+
+	return
+}
+
+type clientConn struct {
 	conn *grpc.ClientConn
-	cli  protocol.TrainingClient
 }
 
-func (c *Client) Disconnect() error {
-	return c.conn.Close()
+func (c *clientConn) Disconnect() error {
+	if c == nil || c.conn == nil {
+		return nil
+	}
+
+	err := c.conn.Close()
+	c.conn = nil
+
+	return err
 }
 
-func (c *Client) SetTrainingInfo(index *training.TrainingIndex, info *training.TrainingInfo) error {
+type TrainingClient struct {
+	*clientConn
+
+	cli protocol.TrainingClient
+}
+
+func (c *TrainingClient) SetTrainingInfo(index *training.TrainingIndex, info *training.TrainingInfo) error {
 	_, err := c.cli.SetTrainingInfo(
 		context.Background(),
 		&protocol.TrainingInfo{
@@ -42,6 +76,28 @@ func (c *Client) SetTrainingInfo(index *training.TrainingIndex, info *training.T
 			ProjectId:     index.ProjectId,
 			AimZipPath:    info.AimZipPath,
 			OutputZipPath: info.OutputZipPath,
+		},
+	)
+
+	return err
+}
+
+type InferenceClient struct {
+	*clientConn
+
+	cli protocol.InferenceClient
+}
+
+func (c *InferenceClient) SetInferenceInfo(index *inference.InferenceIndex, info *inference.InferenceInfo) error {
+	_, err := c.cli.SetInferenceInfo(
+		context.Background(),
+		&protocol.InferenceInfo{
+			Id:         index.Id,
+			User:       index.User,
+			ProjectId:  index.ProjectId,
+			LastCommit: index.LastCommit,
+			Error:      info.Error,
+			AccessUrl:  info.AccessURL,
 		},
 	)
 

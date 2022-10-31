@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TrainingClient interface {
-	SetTrainingInfo(ctx context.Context, in *TrainingInfo, opts ...grpc.CallOption) (*Result, error)
+	SetTrainingInfo(ctx context.Context, in *TrainingInfo, opts ...grpc.CallOption) (*TrainingResult, error)
 }
 
 type trainingClient struct {
@@ -29,9 +29,9 @@ func NewTrainingClient(cc grpc.ClientConnInterface) TrainingClient {
 	return &trainingClient{cc}
 }
 
-func (c *trainingClient) SetTrainingInfo(ctx context.Context, in *TrainingInfo, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
-	err := c.cc.Invoke(ctx, "/xiheInternal.Training/SetTrainingInfo", in, out, opts...)
+func (c *trainingClient) SetTrainingInfo(ctx context.Context, in *TrainingInfo, opts ...grpc.CallOption) (*TrainingResult, error) {
+	out := new(TrainingResult)
+	err := c.cc.Invoke(ctx, "/training.Training/SetTrainingInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *trainingClient) SetTrainingInfo(ctx context.Context, in *TrainingInfo, 
 // All implementations must embed UnimplementedTrainingServer
 // for forward compatibility
 type TrainingServer interface {
-	SetTrainingInfo(context.Context, *TrainingInfo) (*Result, error)
+	SetTrainingInfo(context.Context, *TrainingInfo) (*TrainingResult, error)
 	mustEmbedUnimplementedTrainingServer()
 }
 
@@ -50,7 +50,7 @@ type TrainingServer interface {
 type UnimplementedTrainingServer struct {
 }
 
-func (UnimplementedTrainingServer) SetTrainingInfo(context.Context, *TrainingInfo) (*Result, error) {
+func (UnimplementedTrainingServer) SetTrainingInfo(context.Context, *TrainingInfo) (*TrainingResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetTrainingInfo not implemented")
 }
 func (UnimplementedTrainingServer) mustEmbedUnimplementedTrainingServer() {}
@@ -76,7 +76,7 @@ func _Training_SetTrainingInfo_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/xiheInternal.Training/SetTrainingInfo",
+		FullMethod: "/training.Training/SetTrainingInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TrainingServer).SetTrainingInfo(ctx, req.(*TrainingInfo))
@@ -88,7 +88,7 @@ func _Training_SetTrainingInfo_Handler(srv interface{}, ctx context.Context, dec
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Training_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "xiheInternal.Training",
+	ServiceName: "training.Training",
 	HandlerType: (*TrainingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
