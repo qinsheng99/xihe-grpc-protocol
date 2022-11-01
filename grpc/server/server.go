@@ -18,6 +18,7 @@ type Server interface {
 	Run(string) error
 
 	RegisterTrainingServer(training.TrainingService) error
+	RegisterInferenceServer(inference.InferenceService) error
 }
 
 func NewServer() Server {
