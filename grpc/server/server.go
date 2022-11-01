@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/evaluate"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
 	"github.com/opensourceways/xihe-grpc-protocol/protocol"
@@ -18,6 +19,7 @@ type Server interface {
 	Run(string) error
 
 	RegisterTrainingServer(training.TrainingService) error
+	RegisterEvaluateServer(evaluate.EvaluateService) error
 	RegisterInferenceServer(inference.InferenceService) error
 }
 
@@ -53,6 +55,20 @@ func (impl serverImpl) RegisterInferenceServer(s inference.InferenceService) err
 	}
 
 	protocol.RegisterInferenceServer(impl.server, &inferenceServer{s: s})
+
+	return nil
+}
+
+func (impl serverImpl) RegisterEvaluateServer(s evaluate.EvaluateService) error {
+	if s == nil {
+		return errors.New("invliad service")
+	}
+
+	if impl.server == nil {
+		return errors.New("no server")
+	}
+
+	protocol.RegisterEvaluateServer(impl.server, &evaluateServer{s: s})
 
 	return nil
 }
@@ -126,4 +142,29 @@ func (t *inferenceServer) SetInferenceInfo(ctx context.Context, v *protocol.Infe
 
 	// Must return new(protocol.Result), or grpc will failed.
 	return new(protocol.InferenceResult), t.s.SetInferenceInfo(&index, &info)
+}
+
+// evaluate
+type evaluateServer struct {
+	s evaluate.EvaluateService
+	protocol.UnimplementedEvaluateServer
+}
+
+func (t *evaluateServer) SetEvaluateInfo(ctx context.Context, v *protocol.EvaluateInfo) (
+	*protocol.EvaluateResult, error,
+) {
+	index := evaluate.EvaluateIndex{
+		Id:         v.GetId(),
+		User:       v.GetUser(),
+		ProjectId:  v.GetProjectId(),
+		TrainingID: v.GetTrainingId(),
+	}
+
+	info := evaluate.EvaluateInfo{
+		Error:     v.GetError(),
+		AccessURL: v.GetAccessUrl(),
+	}
+
+	// Must return new(protocol.Result), or grpc will failed.
+	return new(protocol.EvaluateResult), t.s.SetEvaluateInfo(&index, &info)
 }

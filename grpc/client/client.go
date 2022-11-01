@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/evaluate"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
 	"github.com/opensourceways/xihe-grpc-protocol/protocol"
@@ -31,6 +32,18 @@ func NewInferenceClient(endpoint string) (*InferenceClient, error) {
 	return &InferenceClient{
 		clientConn: &c,
 		cli:        protocol.NewInferenceClient(c.conn),
+	}, nil
+}
+
+func NewEvaluateClient(endpoint string) (*EvaluateClient, error) {
+	c, err := newConn(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return &EvaluateClient{
+		clientConn: &c,
+		cli:        protocol.NewEvaluateClient(c.conn),
 	}, nil
 }
 
@@ -96,6 +109,28 @@ func (c *InferenceClient) SetInferenceInfo(index *inference.InferenceIndex, info
 			User:       index.User,
 			ProjectId:  index.ProjectId,
 			LastCommit: index.LastCommit,
+			Error:      info.Error,
+			AccessUrl:  info.AccessURL,
+		},
+	)
+
+	return err
+}
+
+type EvaluateClient struct {
+	*clientConn
+
+	cli protocol.EvaluateClient
+}
+
+func (c *EvaluateClient) SetEvaluateInfo(index *evaluate.EvaluateIndex, info *evaluate.EvaluateInfo) error {
+	_, err := c.cli.SetEvaluateInfo(
+		context.Background(),
+		&protocol.EvaluateInfo{
+			Id:         index.Id,
+			User:       index.User,
+			ProjectId:  index.ProjectId,
+			TrainingId: index.TrainingID,
 			Error:      info.Error,
 			AccessUrl:  info.AccessURL,
 		},

@@ -11,8 +11,8 @@ endef
 
 protocol:
 	$(call tips,Gen Protocol)
-	$(protoc) -I ./proto --go_out=./protocol training.proto inference.proto
-	$(protoc) -I ./proto --go-grpc_out=./protocol training.proto inference.proto
+	$(protoc) -I ./proto --go_out=./protocol training.proto inference.proto evaluate.proto
+	$(protoc) -I ./proto --go-grpc_out=./protocol training.proto inference.proto evaluate.proto
 
 .PHONY: clean
 
