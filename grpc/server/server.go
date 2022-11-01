@@ -42,6 +42,20 @@ func (impl serverImpl) RegisterTrainingServer(s training.TrainingService) error 
 	return nil
 }
 
+func (impl serverImpl) RegisterInferenceServer(s inference.InferenceService) error {
+	if s == nil {
+		return errors.New("invliad service")
+	}
+
+	if impl.server == nil {
+		return errors.New("no server")
+	}
+
+	protocol.RegisterInferenceServer(impl.server, &inferenceServer{s: s})
+
+	return nil
+}
+
 func (impl serverImpl) Run(port string) error {
 	if impl.server == nil {
 		return errors.New("no server")
