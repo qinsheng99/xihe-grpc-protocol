@@ -8,7 +8,8 @@ message SubmissionInfo {
   string id               = 1;
   string competition_id   = 2;
   string phase            = 3;
-  float score             = 4;
+  string status           = 4;
+  float score             = 5;
 }
 
 message SubmissionResult {}

@@ -167,6 +167,7 @@ func (c *CompetitionClient) SetSubmissionInfo(
 			Id:            index.Id,
 			Phase:         index.Phase,
 			CompetitionId: index.CompetitionId,
+			Status:        info.Status,
 			Score:         info.Score,
 		},
 	)

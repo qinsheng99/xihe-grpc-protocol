@@ -201,7 +201,8 @@ func (t *competitionServer) SetSubmissionInfo(ctx context.Context, v *protocol.S
 	}
 
 	info := competition.SubmissionInfo{
-		Score: v.GetScore(),
+		Status: v.GetStatus(),
+		Score:  v.GetScore(),
 	}
 
 	// Must return new(protocol.Result), or grpc will failed.

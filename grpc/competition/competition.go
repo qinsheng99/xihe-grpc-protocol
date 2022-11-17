@@ -7,7 +7,8 @@ type SubmissionIndex struct {
 }
 
 type SubmissionInfo struct {
-	Score float32
+	Status string
+	Score  float32
 }
 
 type CompetitionService interface {
