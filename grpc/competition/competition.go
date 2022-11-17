@@ -1,16 +1,16 @@
 package competition
 
-type SubmissionIndex struct {
-	Id            string
-	Phase         string
-	CompetitionId string
+type CompetitionIndex struct {
+	Id    string
+	Phase string
 }
 
 type SubmissionInfo struct {
+	Id     string
 	Status string
 	Score  float32
 }
 
 type CompetitionService interface {
-	SetSubmissionInfo(*SubmissionIndex, *SubmissionInfo) error
+	SetSubmissionInfo(*CompetitionIndex, *SubmissionInfo) error
 }

@@ -194,13 +194,13 @@ type competitionServer struct {
 func (t *competitionServer) SetSubmissionInfo(ctx context.Context, v *protocol.SubmissionInfo) (
 	*protocol.SubmissionResult, error,
 ) {
-	index := competition.SubmissionIndex{
-		Id:            v.GetId(),
-		Phase:         v.GetPhase(),
-		CompetitionId: v.GetCompetitionId(),
+	index := competition.CompetitionIndex{
+		Phase: v.GetPhase(),
+		Id:    v.GetCompetitionId(),
 	}
 
 	info := competition.SubmissionInfo{
+		Id:     v.GetId(),
 		Status: v.GetStatus(),
 		Score:  v.GetScore(),
 	}
