@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/competition"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/evaluate"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
@@ -21,6 +22,7 @@ type Server interface {
 	RegisterTrainingServer(training.TrainingService) error
 	RegisterEvaluateServer(evaluate.EvaluateService) error
 	RegisterInferenceServer(inference.InferenceService) error
+	RegisterCompetitionServer(competition.CompetitionService) error
 }
 
 func NewServer() Server {
@@ -69,6 +71,20 @@ func (impl serverImpl) RegisterEvaluateServer(s evaluate.EvaluateService) error 
 	}
 
 	protocol.RegisterEvaluateServer(impl.server, &evaluateServer{s: s})
+
+	return nil
+}
+
+func (impl serverImpl) RegisterCompetitionServer(s competition.CompetitionService) error {
+	if s == nil {
+		return errors.New("invliad service")
+	}
+
+	if impl.server == nil {
+		return errors.New("no server")
+	}
+
+	protocol.RegisterCompetitionServer(impl.server, &competitionServer{s: s})
 
 	return nil
 }
@@ -167,4 +183,27 @@ func (t *evaluateServer) SetEvaluateInfo(ctx context.Context, v *protocol.Evalua
 
 	// Must return new(protocol.Result), or grpc will failed.
 	return new(protocol.EvaluateResult), t.s.SetEvaluateInfo(&index, &info)
+}
+
+// competition
+type competitionServer struct {
+	s competition.CompetitionService
+	protocol.UnimplementedCompetitionServer
+}
+
+func (t *competitionServer) SetSubmissionInfo(ctx context.Context, v *protocol.SubmissionInfo) (
+	*protocol.SubmissionResult, error,
+) {
+	index := competition.SubmissionIndex{
+		Id:            v.GetId(),
+		Phase:         v.GetPhase(),
+		CompetitionId: v.GetCompetitionId(),
+	}
+
+	info := competition.SubmissionInfo{
+		Score: v.GetScore(),
+	}
+
+	// Must return new(protocol.Result), or grpc will failed.
+	return new(protocol.SubmissionResult), t.s.SetSubmissionInfo(&index, &info)
 }

@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/competition"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/evaluate"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
@@ -44,6 +45,18 @@ func NewEvaluateClient(endpoint string) (*EvaluateClient, error) {
 	return &EvaluateClient{
 		clientConn: &c,
 		cli:        protocol.NewEvaluateClient(c.conn),
+	}, nil
+}
+
+func NewCompetitionClient(endpoint string) (*CompetitionClient, error) {
+	c, err := newConn(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CompetitionClient{
+		clientConn: &c,
+		cli:        protocol.NewCompetitionClient(c.conn),
 	}, nil
 }
 
@@ -133,6 +146,28 @@ func (c *EvaluateClient) SetEvaluateInfo(index *evaluate.EvaluateIndex, info *ev
 			TrainingId: index.TrainingID,
 			Error:      info.Error,
 			AccessUrl:  info.AccessURL,
+		},
+	)
+
+	return err
+}
+
+type CompetitionClient struct {
+	*clientConn
+
+	cli protocol.CompetitionClient
+}
+
+func (c *CompetitionClient) SetSubmissionInfo(
+	index *competition.SubmissionIndex, info *competition.SubmissionInfo,
+) error {
+	_, err := c.cli.SetSubmissionInfo(
+		context.Background(),
+		&protocol.SubmissionInfo{
+			Id:            index.Id,
+			Phase:         index.Phase,
+			CompetitionId: index.CompetitionId,
+			Score:         info.Score,
 		},
 	)
 

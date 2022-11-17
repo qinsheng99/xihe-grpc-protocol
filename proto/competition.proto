@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package competition;
+
+option go_package = "../protocol";
+
+message SubmissionInfo {
+  string id               = 1;
+  string competition_id   = 2;
+  string phase            = 3;
+  float score             = 4;
+}
+
+message SubmissionResult {}
+
+service Competition {
+  rpc SetSubmissionInfo(SubmissionInfo) returns (SubmissionResult) {}
+}
