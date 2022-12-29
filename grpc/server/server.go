@@ -11,6 +11,7 @@ import (
 
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/competition"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/evaluate"
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/finetune"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
 	"github.com/opensourceways/xihe-grpc-protocol/protocol"
@@ -19,6 +20,7 @@ import (
 type Server interface {
 	Run(string) error
 
+	RegisterFinetuneServer(finetune.FinetuneService) error
 	RegisterTrainingServer(training.TrainingService) error
 	RegisterEvaluateServer(evaluate.EvaluateService) error
 	RegisterInferenceServer(inference.InferenceService) error
@@ -43,6 +45,20 @@ func (impl serverImpl) RegisterTrainingServer(s training.TrainingService) error 
 	}
 
 	protocol.RegisterTrainingServer(impl.server, &trainingServer{s: s})
+
+	return nil
+}
+
+func (impl serverImpl) RegisterFinetuneServer(s finetune.FinetuneService) error {
+	if s == nil {
+		return errors.New("invliad service")
+	}
+
+	if impl.server == nil {
+		return errors.New("no server")
+	}
+
+	protocol.RegisterFinetuneServer(impl.server, &finetuneServer{s: s})
 
 	return nil
 }
@@ -109,6 +125,7 @@ func (impl serverImpl) Run(port string) error {
 	return impl.server.Serve(listen)
 }
 
+// train
 type trainingServer struct {
 	s training.TrainingService
 	protocol.UnimplementedTrainingServer
@@ -133,6 +150,29 @@ func (t *trainingServer) SetTrainingInfo(ctx context.Context, v *protocol.Traini
 
 	// Must return new(protocol.Result), or grpc will failed.
 	return new(protocol.TrainingResult), t.s.SetTrainingInfo(&index, &info)
+}
+
+// finetune
+type finetuneServer struct {
+	s finetune.FinetuneService
+	protocol.UnimplementedFinetuneServer
+}
+
+func (t *finetuneServer) SetFinetuneInfo(ctx context.Context, v *protocol.FinetuneInfo) (
+	*protocol.FinetuneResult, error,
+) {
+	index := finetune.FinetuneIndex{
+		Id:   v.GetId(),
+		User: v.GetUser(),
+	}
+
+	info := finetune.FinetuneInfo{
+		Status:   v.GetStatus(),
+		Duration: int(v.GetDuration()),
+	}
+
+	// Must return new(protocol.Result), or grpc will failed.
+	return new(protocol.FinetuneResult), t.s.SetFinetuneInfo(&index, &info)
 }
 
 // inference

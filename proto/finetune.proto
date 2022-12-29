@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package finetune;
+
+option go_package = "../protocol";
+
+message FinetuneInfo {
+  string id               = 1;
+  string user             = 2;
+  string status           = 3;
+  int32  duration         = 4;
+}
+
+message FinetuneResult {}
+
+service Finetune {
+  rpc SetFinetuneInfo(FinetuneInfo) returns (FinetuneResult) {}
+}

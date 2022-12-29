@@ -7,6 +7,7 @@ import (
 
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/competition"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/evaluate"
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/finetune"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
 	"github.com/opensourceways/xihe-grpc-protocol/protocol"
@@ -21,6 +22,18 @@ func NewTrainingClient(endpoint string) (*TrainingClient, error) {
 	return &TrainingClient{
 		clientConn: &c,
 		cli:        protocol.NewTrainingClient(c.conn),
+	}, nil
+}
+
+func NewFinetuneClient(endpoint string) (*FinetuneClient, error) {
+	c, err := newConn(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return &FinetuneClient{
+		clientConn: &c,
+		cli:        protocol.NewFinetuneClient(c.conn),
 	}, nil
 }
 
@@ -108,6 +121,28 @@ func (c *TrainingClient) SetTrainingInfo(index *training.TrainingIndex, info *tr
 	return err
 }
 
+// Finetune
+type FinetuneClient struct {
+	*clientConn
+
+	cli protocol.FinetuneClient
+}
+
+func (c *FinetuneClient) SetFinetuneInfo(index *finetune.FinetuneIndex, info *finetune.FinetuneInfo) error {
+	_, err := c.cli.SetFinetuneInfo(
+		context.Background(),
+		&protocol.FinetuneInfo{
+			Id:       index.Id,
+			User:     index.User,
+			Status:   info.Status,
+			Duration: int32(info.Duration),
+		},
+	)
+
+	return err
+}
+
+// Inference
 type InferenceClient struct {
 	*clientConn
 
