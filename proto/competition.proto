@@ -10,6 +10,7 @@ message SubmissionInfo {
   string phase            = 3;
   string status           = 4;
   float score             = 5;
+  string player_id        = 6;
 }
 
 message SubmissionResult {}
