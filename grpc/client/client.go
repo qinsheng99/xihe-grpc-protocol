@@ -200,10 +200,11 @@ func (c *CompetitionClient) SetSubmissionInfo(
 		context.Background(),
 		&protocol.SubmissionInfo{
 			CompetitionId: index.Id,
-			Phase:         index.Phase,
+			Phase:         info.Phase,
 			Id:            info.Id,
 			Status:        info.Status,
 			Score:         info.Score,
+			PlayerId:      info.PlayerId,
 		},
 	)
 

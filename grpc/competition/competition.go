@@ -1,14 +1,15 @@
 package competition
 
 type CompetitionIndex struct {
-	Id    string
-	Phase string
+	Id string
 }
 
 type SubmissionInfo struct {
-	Id     string
-	Status string
-	Score  float32
+	Id       string
+	Status   string
+	Score    float32
+	Phase    string
+	PlayerId string
 }
 
 type CompetitionService interface {
