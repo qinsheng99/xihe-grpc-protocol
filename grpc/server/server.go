@@ -234,17 +234,14 @@ type competitionServer struct {
 func (t *competitionServer) SetSubmissionInfo(ctx context.Context, v *protocol.SubmissionInfo) (
 	*protocol.SubmissionResult, error,
 ) {
-	index := competition.CompetitionIndex{
-		Phase: v.GetPhase(),
-		Id:    v.GetCompetitionId(),
-	}
-
 	info := competition.SubmissionInfo{
-		Id:     v.GetId(),
-		Status: v.GetStatus(),
-		Score:  v.GetScore(),
+		Id:       v.GetId(),
+		Status:   v.GetStatus(),
+		Score:    v.GetScore(),
+		Phase:    v.GetPhase(),
+		PlayerId: v.GetPlayerId(),
 	}
 
 	// Must return new(protocol.Result), or grpc will failed.
-	return new(protocol.SubmissionResult), t.s.SetSubmissionInfo(&index, &info)
+	return new(protocol.SubmissionResult), t.s.SetSubmissionInfo(v.GetCompetitionId(), &info)
 }

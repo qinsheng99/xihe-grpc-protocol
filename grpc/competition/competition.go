@@ -1,9 +1,5 @@
 package competition
 
-type CompetitionIndex struct {
-	Id string
-}
-
 type SubmissionInfo struct {
 	Id       string
 	Status   string
@@ -13,5 +9,5 @@ type SubmissionInfo struct {
 }
 
 type CompetitionService interface {
-	SetSubmissionInfo(*CompetitionIndex, *SubmissionInfo) error
+	SetSubmissionInfo(string, *SubmissionInfo) error
 }
